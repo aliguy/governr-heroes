@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>governr — see every AI running in your business</title>
+  <meta name="description" content="governr maps every AI asset in your business into one live AI Atlas. See it, price it, watch it, prove it. Audit-ready in two hours." />
+  <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800,900&f[]=chivo-mono@400,500&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      interpolate-size:allow-keywords;
+      --ink:#000A1A; --ink-2:#03101f; --paper:#F6F7F9; --white:#fff; --grey:#ECEFF4; --slate:#5F6470;
+      --cobalt:#0A3EFF; --cobalt-d:#0833cc; --cobalt-l:#2F62FF; --deep:#10296E; --cyan:#04D9FF;
+      --green:#13C892; --amber:#FF951A; --red:#F5314A; --violet:#7C5CFF; --magenta:#F23DA0;
+      --line-l:rgba(16,41,110,.12); --line-d:rgba(255,255,255,.10); --line-c:rgba(47,98,255,.2);
+      --soft:rgba(231,238,247,.74); --soft2:rgba(231,238,247,.5);
+      --display:'Switzer',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      --mono:'Chivo Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
+    *{box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    html,body{margin:0;background:var(--ink);}
+    body{font-family:var(--display);color:#0a1424;-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;}
+    a{color:inherit;text-decoration:none;}
+    .wrap{max-width:1200px;margin:0 auto;padding:0 40px;}
+    .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:none;}
+    .cta{display:inline-flex;align-items:center;gap:9px;background:var(--cobalt);color:#fff;border:none;border-radius:4px;
+      padding:15px 26px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;box-shadow:0 12px 34px rgba(10,62,255,.34);transition:transform .14s,box-shadow .16s,background .16s;}
+    .cta:hover{background:var(--cobalt-d);transform:translateY(-1px);box-shadow:0 16px 42px rgba(10,62,255,.46);}
+    .cta.ghost{background:transparent;border:1.5px solid currentColor;box-shadow:none;color:inherit;}
+    .cta.ghost.d{color:#0a1322;border-color:rgba(16,41,110,.3);}
+    .cta.ghost.d:hover{background:rgba(16,41,110,.04);}
+    .cta.ghost.l{color:#fff;border-color:rgba(255,255,255,.3);}
+    .cta.ghost.l:hover{background:rgba(255,255,255,.06);}
+    .arr{width:16px;height:16px;}
+
+    /* section band scaffolding */
+    .band{position:relative;}
+    .band.ink{background:var(--ink);color:#eaf1f9;}
+    .band.paper{background:var(--paper);color:#0a1424;}
+    .band.cobalt{background:var(--cobalt);color:#fff;}
+    .pad{padding:120px 0;}
+    .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:var(--cobalt);display:inline-flex;align-items:center;gap:10px;}
+    .ink .eyebrow,.cobalt .eyebrow{color:var(--cobalt-l);}
+    .eyebrow::before{content:"";width:22px;height:1px;background:currentColor;opacity:.6;}
+    h2{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height:1.04;font-size:clamp(32px,4.4vw,54px);margin:18px 0 0;}
+    .ink h2,.cobalt h2{color:#fff;}
+    .paper h2{color:#070d18;}
+    .accent{color:var(--cobalt);}
+    .ink .accent,.cobalt .accent{color:var(--cobalt-l);}
+    .lead{font-size:clamp(16px,1.5vw,19px);line-height:1.6;max-width:640px;margin:20px 0 0;}
+    .ink .lead{color:var(--soft);}.paper .lead{color:var(--slate);}.cobalt .lead{color:rgba(255,255,255,.86);}
+    .rule{height:1px;background:var(--line-l);}
+    .ink .rule{background:var(--line-d);}
+
+    /* ============ NAV ============ */
+    .nav{position:fixed;top:0;left:0;right:0;z-index:60;transition:background .25s,border-color .25s;border-bottom:1px solid transparent;}
+    .nav.solid{background:rgba(0,10,26,.82);backdrop-filter:blur(12px);border-color:var(--line-d);}
+    .nav-in{display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto;padding:18px 40px;}
+    .brand{display:flex;align-items:center;gap:9px;font-size:20px;font-weight:600;letter-spacing:-.02em;color:#fff;}
+    .nav-links{display:flex;gap:30px;align-items:center;}
+    .nav-links a{color:var(--soft);font-size:14.5px;font-weight:500;}
+    .nav-links a:hover{color:#fff;}
+    .nav-links .cta{padding:10px 18px;box-shadow:none;}
+    @media(max-width:880px){.nav-links a:not(.cta){display:none;}}
+
+    /* ============ HERO ============ */
+    .hero{position:relative;overflow:hidden;background:var(--ink);min-height:100vh;display:flex;align-items:center;
+      background-image:radial-gradient(60% 80% at 82% 36%, rgba(47,98,255,.10), rgba(47,98,255,0) 60%),radial-gradient(70% 60% at 30% 120%, rgba(10,62,255,.2), rgba(10,62,255,0) 60%),linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+      background-size:auto,auto,60px 60px,60px 60px;}
+    .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center;padding:140px 0 90px;width:100%;}
+    .hero .eyebrow{color:var(--cobalt-l);}
+    .hero .eyebrow::before{background:var(--cobalt-l);}
+    .hero h1{font-family:var(--display);font-weight:800;letter-spacing:-.045em;line-height:.98;color:#fff;font-size:clamp(40px,5.6vw,76px);margin:20px 0 0;}
+    .hero h1 .c{color:var(--cobalt-l);}
+    .hero .sub{color:var(--soft);font-size:clamp(15px,1.45vw,18px);line-height:1.6;max-width:460px;margin:24px 0 0;}
+    .hero .cta-row{display:flex;gap:13px;margin-top:34px;flex-wrap:wrap;}
+    .radar{position:relative;width:100%;aspect-ratio:1/1;max-width:540px;margin-left:auto;}
+    .radar canvas{width:100%;height:100%;display:block;}
+    @media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:30px;padding-top:120px;}.radar{max-width:400px;}}
+
+    /* ============ TRUST MARQUEE ============ */
+    .credband{background:var(--cobalt);overflow:hidden;}
+    .credband-in{max-width:1200px;margin:0 auto;padding:22px 40px;display:flex;align-items:center;gap:34px;}
+    .cred-label{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.72);}
+    .marquee{position:relative;flex:1;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);}
+    .marquee:hover .track{animation-play-state:paused;}
+    .track{display:flex;align-items:center;gap:0;width:max-content;animation:scrollx 50s linear infinite;will-change:transform;backface-visibility:hidden;transform:translateZ(0);}
+    .track .lg{display:flex;align-items:center;height:30px;margin-right:64px;}
+    .track .lg img{height:24px;width:auto;opacity:.96;}
+    .track .lg .txt{font-family:var(--display);font-weight:700;font-size:20px;color:#fff;letter-spacing:-.01em;opacity:.96;}
+    @keyframes scrollx{from{transform:translate3d(0,0,0);}to{transform:translate3d(-50%,0,0);}}
+    @media(max-width:760px){.cred-label{display:none;}}
+
+    /* ============ PROBLEM (editorial) ============ */
+    .editorial{max-width:1000px;}
+    .editorial .big{font-family:var(--display);font-weight:700;letter-spacing:-.04em;line-height:1.05;font-size:clamp(34px,5.2vw,64px);color:#070d18;}
+    .editorial .big .mut{color:rgba(10,20,36,.32);}
+    .editorial .sub{color:var(--slate);font-size:19px;line-height:1.6;max-width:640px;margin:28px 0 0;}
+    .three{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:64px;border-top:1px solid var(--line-l);}
+    .three .it{padding:44px 40px 44px 0;border-right:1px solid var(--line-l);}
+    .three .it:not(:first-child){padding-left:40px;}
+    .three .it:last-child{border-right:none;padding-right:0;}
+    .three .it .n{font-family:var(--mono);font-size:12px;color:var(--cobalt);}
+    .three .it h4{font-size:18px;font-weight:600;margin:12px 0 8px;letter-spacing:-.01em;color:#0a1322;}
+    .three .it p{color:var(--slate);font-size:14.5px;line-height:1.6;margin:0;}
+    @media(max-width:780px){.three{grid-template-columns:1fr;}.three .it{border-right:none;border-bottom:1px solid var(--line-l);padding:24px 0;}}
+
+    /* ============ ESTATE REVEAL (full-bleed graph) ============ */
+    .reveal{position:relative;background:var(--ink);overflow:hidden;min-height:88vh;display:flex;align-items:center;}
+    .reveal .gstage{position:absolute;inset:0;z-index:1;}
+    .reveal .gstage canvas{width:100%;height:100%;display:block;}
+    .reveal .scrim{position:absolute;inset:0;z-index:2;background:radial-gradient(60% 70% at 50% 50%, rgba(0,10,26,.78) 30%, rgba(0,10,26,.35) 60%, rgba(0,10,26,.78) 100%);}
+    .reveal .inner{position:relative;z-index:3;width:100%;text-align:center;padding:120px 0;}
+    .reveal .eyebrow{justify-content:center;color:var(--cobalt-l);}.reveal .eyebrow::before{background:var(--cobalt-l);}
+    .bignums{display:flex;align-items:center;justify-content:center;gap:clamp(28px,6vw,90px);margin:30px 0 0;flex-wrap:wrap;}
+    .bignums .col{display:flex;flex-direction:column;align-items:center;}
+    .bignums .v{font-family:var(--display);font-weight:800;letter-spacing:-.05em;line-height:1;font-size:clamp(72px,13vw,180px);color:#fff;}
+    .bignums .v.q{color:rgba(231,238,247,.34);}
+    .bignums .v.a{color:var(--cobalt-l);text-shadow:0 0 60px rgba(47,98,255,.32);}
+    .bignums .l{font-family:var(--mono);font-size:12px;color:var(--soft);margin-top:14px;letter-spacing:.04em;max-width:160px;}
+    .bignums .arrowcol{align-self:center;}
+    .bignums .arrowcol svg{width:clamp(40px,6vw,90px);color:rgba(231,238,247,.4);}
+    .reveal .rsub{color:var(--soft);font-size:clamp(16px,1.6vw,20px);max-width:620px;margin:40px auto 0;line-height:1.55;}
+
+    /* ============ WHAT IS THE ATLAS (benefits) ============ */
+    .atlasgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:50px;border-top:1px solid var(--line-d);}
+    .atlasgrid .ag{padding:30px 26px;border-right:1px solid var(--line-d);}
+    .atlasgrid .ag:first-child{padding-left:0;}
+    .atlasgrid .ag:last-child{border-right:none;padding-right:0;}
+    .atlasgrid .ag .agn{font-family:var(--mono);font-size:12px;color:var(--cobalt-l);}
+    .atlasgrid .ag h4{font-size:18px;font-weight:600;margin:14px 0 8px;letter-spacing:-.01em;color:#fff;}
+    .atlasgrid .ag p{color:var(--soft);font-size:14px;line-height:1.6;margin:0;}
+    @media(max-width:820px){.atlasgrid{grid-template-columns:1fr 1fr;}.atlasgrid .ag{border-right:none;border-bottom:1px solid var(--line-d);padding:24px 0;}}
+
+    /* ============ FEATURE ROWS (Command/Assess/Monitor/Report) ============ */
+    .feat{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;padding:72px 0;border-top:1px solid var(--line-l);}
+    .feat:nth-child(odd) .feat-art{order:2;}
+    .feat .ix{font-family:var(--mono);font-size:13px;color:var(--cobalt);letter-spacing:.1em;}
+    .feat h3{font-family:var(--display);font-weight:700;letter-spacing:-.03em;font-size:clamp(26px,3vw,38px);margin:14px 0 0;color:#070d18;line-height:1.08;}
+    .feat p{color:var(--slate);font-size:16px;line-height:1.62;margin:18px 0 0;max-width:460px;}
+    .feat .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+    .feat .tag{font-family:var(--mono);font-size:11px;color:var(--cobalt);background:rgba(10,62,255,.07);border:1px solid rgba(10,62,255,.16);border-radius:4px;padding:6px 11px;}
+    .art{background:var(--ink);border-radius:8px;padding:26px;min-height:300px;position:relative;overflow:hidden;box-shadow:0 30px 70px rgba(16,41,110,.16);
+      background-image:radial-gradient(80% 100% at 50% 0%, rgba(10,62,255,.22), rgba(10,62,255,0) 60%);}
+    .art .alabel{position:absolute;bottom:14px;left:18px;font-family:var(--mono);font-size:10px;color:var(--soft2);}
+    .art .ahead{display:flex;align-items:center;gap:8px;margin-bottom:18px;}
+    .art .ahead .d{width:8px;height:8px;border-radius:50%;}
+    .art .ahead .t{font-family:var(--mono);font-size:10.5px;color:var(--soft);letter-spacing:.06em;}
+    .art .ahead .badge{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--cobalt-l);background:rgba(47,98,255,.08);border:1px solid rgba(47,98,255,.2);border-radius:4px;padding:3px 8px;}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;}
+    .chip{font-family:var(--mono);font-size:11px;color:var(--cobalt-l);background:rgba(47,98,255,.08);border:1px solid rgba(47,98,255,.2);border-radius:4px;padding:7px 11px;}
+    .risk{display:flex;flex-direction:column;gap:13px;}
+    .risk-row{display:grid;grid-template-columns:110px 1fr 36px;align-items:center;gap:12px;}
+    .risk-row .rl{font-family:var(--mono);font-size:11px;color:var(--soft);}
+    .risk-row .rt{height:7px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;}
+    .risk-row .rf{display:block;height:100%;border-radius:4px;min-width:6px;}
+    .risk-row .rv{font-family:var(--mono);font-size:11px;color:#fff;text-align:right;}
+    .mon{display:flex;flex-direction:column;gap:10px;}
+    .mon-row{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;color:#dce6f2;}
+    .mon-row .dot{width:8px;height:8px;border-radius:50%;flex:none;}
+    .mon-row .st{margin-left:auto;font-size:9.5px;letter-spacing:.06em;}
+    .fwk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .fwk span{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:11px;color:#cfe0ee;background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:4px;padding:9px 11px;}
+    .fwk .fl{flex:none;width:18px;height:12px;border-radius:2px;overflow:hidden;display:block;box-shadow:0 0 0 1px rgba(255,255,255,.08);}
+    .fwk .fl svg{display:block;width:100%;height:100%;}
+    @media(max-width:840px){.feat{grid-template-columns:1fr;gap:28px;}.feat:nth-child(odd) .feat-art{order:0;}}
+
+    /* ============ TIMELINE (two hours) ============ */
+    .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:64px;}
+    .tl{position:relative;padding:0 26px 0 0;}
+    .tl::before{content:"";position:absolute;top:7px;left:0;right:0;height:1px;background:var(--line-d);}
+    .tl .node{width:14px;height:14px;border-radius:50%;background:var(--cobalt);box-shadow:0 0 0 5px rgba(10,62,255,.18);position:relative;z-index:2;}
+    .tl.live .node{background:var(--cobalt-l);box-shadow:0 0 0 5px rgba(47,98,255,.18);}
+    .tl .time{font-family:var(--mono);font-size:12px;color:var(--cobalt-l);margin-top:22px;letter-spacing:.06em;}
+    .tl h4{font-size:18px;font-weight:600;margin:8px 0 8px;color:#fff;letter-spacing:-.01em;}
+    .tl p{color:var(--soft);font-size:14px;line-height:1.58;margin:0;padding-right:14px;}
+    @media(max-width:820px){.timeline{grid-template-columns:1fr;gap:24px;}.tl{padding:0 0 0 28px;}.tl::before{top:0;bottom:0;left:6px;right:auto;width:1px;height:auto;}}
+
+    /* ============ PROOF ============ */
+    .proofgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:60px;border-top:1px solid var(--line-l);border-bottom:1px solid var(--line-l);}
+    .proofgrid .ps{padding:52px 44px 52px 0;border-right:1px solid var(--line-l);}
+    .proofgrid .ps:not(:first-child){padding-left:44px;}
+    .proofgrid .ps:last-child{border-right:none;}
+    .proofgrid .v{font-family:var(--display);font-weight:800;font-size:clamp(44px,6vw,76px);letter-spacing:-.04em;color:#070d18;line-height:1;}
+    .proofgrid .l{color:var(--slate);font-size:14.5px;margin-top:14px;line-height:1.5;max-width:250px;}
+    .proofgrid .src{font-family:var(--mono);font-size:10.5px;color:#9aa0ad;margin-top:14px;letter-spacing:.02em;}
+    @media(max-width:780px){.proofgrid{grid-template-columns:1fr;}.proofgrid .ps{border-right:none;border-bottom:1px solid var(--line-l);padding:28px 0;}}
+    .quote-art{margin-top:60px;display:grid;grid-template-columns:auto 1fr;gap:30px;align-items:start;}
+    .quote-art .mark{font-family:var(--display);font-weight:800;font-size:90px;line-height:.6;color:var(--cobalt);opacity:.25;}
+    .quote-art blockquote{margin:0;font-family:var(--display);font-weight:500;font-size:clamp(20px,2.4vw,30px);line-height:1.4;letter-spacing:-.02em;color:#0a1322;max-width:840px;}
+    .quote-art .by{margin-top:20px;font-family:var(--mono);font-size:13px;color:var(--slate);}
+    @media(max-width:680px){.quote-art{grid-template-columns:1fr;gap:8px;}.quote-art .mark{font-size:60px;}}
+
+    /* ============ PERSONAS ============ */
+    .personas{display:grid;grid-template-columns:repeat(2,1fr);gap:0;margin-top:56px;border-top:1px solid var(--line-d);border-left:1px solid var(--line-d);}
+    .pcell{padding:40px 36px;border-right:1px solid var(--line-d);border-bottom:1px solid var(--line-d);transition:background .16s;}
+    .pcell:hover{background:rgba(47,98,255,.04);}
+    .pcell .role{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--cobalt-l);}
+    .pcell h3{font-size:21px;font-weight:600;margin:12px 0 10px;color:#fff;letter-spacing:-.015em;}
+    .pcell p{color:var(--soft);font-size:15px;line-height:1.6;margin:0;}
+    @media(max-width:760px){.personas{grid-template-columns:1fr;}}
+
+    /* ============ SECURITY STRIP ============ */
+    .secstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:50px;}
+    .secstrip .sc{border:1px solid var(--line-l);border-radius:6px;padding:24px;background:var(--white);}
+    .secstrip .sc .si{width:30px;height:30px;color:var(--cobalt);margin-bottom:14px;}
+    .secstrip .sc h4{font-size:15.5px;font-weight:600;margin:0 0 6px;color:#0a1322;letter-spacing:-.01em;}
+    .secstrip .sc p{color:var(--slate);font-size:13px;line-height:1.55;margin:0;}
+    @media(max-width:860px){.secstrip{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:480px){.secstrip{grid-template-columns:1fr;}}
+
+    /* ============ FAQ ============ */
+    .faq{margin:50px auto 0;max-width:760px;text-align:left;}
+    #faq .wrap{text-align:center;}
+    details{border-bottom:1px solid var(--line-l);}
+    details summary{cursor:pointer;list-style:none;padding:24px 0;font-size:18px;font-weight:600;color:#0a1322;display:flex;justify-content:space-between;gap:20px;align-items:center;letter-spacing:-.01em;transition:color .2s ease;}
+    details summary:hover{color:var(--cobalt);}
+    details summary::-webkit-details-marker{display:none;}
+    details summary::after{content:"+";font-family:var(--mono);color:var(--cobalt);font-size:22px;line-height:1;transition:transform .32s cubic-bezier(.4,0,.2,1);}
+    details[open] summary::after{transform:rotate(135deg);}
+    details p{margin:0 0 26px;color:var(--slate);font-size:15.5px;line-height:1.64;max-width:740px;}
+    details::details-content{height:0;overflow:hidden;opacity:0;transition:height .36s cubic-bezier(.4,0,.2,1),opacity .3s ease,content-visibility .36s allow-discrete;}
+    details[open]::details-content{height:auto;opacity:1;}
+
+    /* floating atlas card (hero overlap, Stello move) */
+    .atlas-card{position:absolute;left:-26px;bottom:-22px;z-index:4;background:rgba(6,16,30,.86);border:1px solid var(--line-c);border-radius:8px;padding:14px 16px;backdrop-filter:blur(8px);box-shadow:0 24px 60px rgba(0,4,12,.5);min-width:232px;}
+    .atlas-card .ac-top{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--soft);letter-spacing:.04em;}
+    .atlas-card .ac-top .ld{width:7px;height:7px;border-radius:50%;background:var(--cobalt-l);animation:livedot 2s infinite;}
+    @keyframes livedot{0%{box-shadow:0 0 0 0 rgba(47,98,255,.55);}70%{box-shadow:0 0 0 7px rgba(47,98,255,0);}100%{box-shadow:0 0 0 0 rgba(47,98,255,0);}}
+    .atlas-card .ac-stats{display:flex;gap:22px;margin-top:12px;}
+    .atlas-card .ac-stats > div{display:flex;flex-direction:column;}
+    .atlas-card .ac-stats b{font-family:var(--display);font-weight:700;font-size:22px;color:#fff;letter-spacing:-.02em;}
+    .atlas-card .ac-stats b.r{color:#FF8A8C;}
+    .atlas-card .ac-stats span{font-family:var(--mono);font-size:9.5px;color:var(--soft2);margin-top:2px;}
+    @media(max-width:900px){.atlas-card{left:0;bottom:6px;}}
+
+    /* integrations band (Varick "works with your systems") */
+    .integ{display:flex;flex-direction:column;gap:0;margin-top:50px;}
+    .integ-row{display:grid;grid-template-columns:150px 1fr;gap:28px;align-items:start;padding:24px 0;border-bottom:1px solid var(--line-d);}
+    .integ-row:first-child{border-top:1px solid var(--line-d);}
+    .integ-row .cat{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--cobalt-l);padding-top:8px;}
+    .integ-chips{display:flex;flex-wrap:wrap;gap:8px;}
+    .integ-chips span{font-family:var(--mono);font-size:12px;color:#cfe0ee;background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:4px;padding:8px 12px;transition:border-color .14s,background .14s;}
+    .integ-chips span:hover{border-color:var(--line-c);background:rgba(47,98,255,.06);}
+    @media(max-width:680px){.integ-row{grid-template-columns:1fr;gap:12px;}}
+
+    /* network-graph panel */
+    .net{width:100%;height:248px;display:block;}
+    /* taller filled risk bars */
+    .risk-row .rt{height:5px;border-radius:4px;}
+    .risk-row .rf{border-radius:4px;box-shadow:0 0 12px -2px currentColor;}
+
+    /* Varick-style integrations: copy + vertical logo tickers */
+    .integ2{display:grid;grid-template-columns:minmax(0,440px) 1fr;gap:56px;margin-top:8px;align-items:center;}
+    .integ2 .icopy p.lead{margin-top:18px;}
+    .integ2 .icopy .cta{margin-top:28px;}
+    .tickers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;height:380px;overflow:hidden;
+      -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent);}
+    .tcol{overflow:hidden;}
+    .tlist{display:flex;flex-direction:column;gap:0;animation:tickup 28s linear infinite;will-change:transform;backface-visibility:hidden;}
+    .tcol:nth-child(2) .tlist{animation-duration:30s;animation-direction:reverse;}
+    .tcol:nth-child(3) .tlist{animation-duration:27s;}
+    .tpill{display:flex;align-items:center;gap:11px;background:rgba(255,255,255,.04);border:1px solid var(--line-d);border-radius:99px;padding:12px 18px;margin-bottom:16px;font-family:var(--mono);font-size:13px;color:#cfe0ee;white-space:nowrap;}
+    .tpill .ic{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;padding:5px;flex:none;}
+    .tpill .ic img{width:100%;height:100%;object-fit:contain;display:block;opacity:.95;}
+    @keyframes tickup{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-50%,0)}}
+    @media(max-width:900px){.integ2{grid-template-columns:1fr;gap:34px;}.tickers{height:300px;}}
+
+    /* Exa-style benchmark chart */
+    .bench{display:grid;grid-template-columns:minmax(0,400px) 1fr;gap:72px;margin-top:36px;align-items:stretch;}
+    .bench .bcopy{display:flex;flex-direction:column;justify-content:center;padding:8px 28px 8px 0;}
+    .bench .blist{margin-top:34px;display:flex;flex-direction:column;gap:0;}
+    .bench .bitem{display:grid;grid-template-columns:3px 1fr;gap:20px;padding:20px 0;}
+    .bench .bitem .bar-ind{border-radius:99px;background:var(--line-d);}
+    .bench .bitem.active .bar-ind{background:var(--cobalt-l);}
+    .bench .bitem h4{font-size:17px;font-weight:600;margin:0;color:rgba(255,255,255,.5);letter-spacing:-.01em;}
+    .bench .bitem.active h4{color:#fff;}
+    .bench .bitem p{margin:8px 0 0;color:var(--soft);font-size:14px;line-height:1.5;}
+    .bench .bitem:not(.active) p{display:none;}
+    .chart{background:#FAF9F7;border-radius:8px;padding:34px 30px 26px;display:flex;flex-direction:column;min-height:360px;}
+    .chart .yl{font-family:var(--mono);font-size:11px;color:#8C8880;margin-bottom:8px;}
+    .chart .plot{flex:1;display:flex;align-items:flex-end;justify-content:space-around;gap:26px;border-left:1px solid rgba(16,41,110,.18);border-bottom:1px solid rgba(16,41,110,.18);padding:0 10px;}
+    .chart .bcol{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;flex:1;max-width:96px;}
+    .chart .bcol .bv{font-family:var(--mono);font-size:13px;font-weight:600;color:#0a1322;margin-bottom:8px;}
+    .chart .bcol .bbar{width:100%;border-radius:3px 3px 0 0;height:0;transition:height 1s cubic-bezier(.4,0,.2,1);}
+    .chart .blabels{display:flex;justify-content:space-around;gap:26px;padding:12px 10px 0;}
+    .chart .blabels span{flex:1;max-width:96px;text-align:center;font-family:var(--mono);font-size:11.5px;color:#514837;}
+    @media(max-width:900px){.bench{grid-template-columns:1fr;gap:30px;}}
+
+    /* ============ FINAL CTA ============ */
+    .final{text-align:center;padding:130px 40px;position:relative;overflow:hidden;}
+    .band.cobalt.final{background:radial-gradient(95% 130% at 50% 6%, rgba(255,255,255,.14), rgba(255,255,255,0) 52%), linear-gradient(180deg, var(--grey) 0%, var(--cobalt) 13%, var(--cobalt) 60%, var(--cobalt-d) 100%);}
+    .final::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.6;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:46px 46px;-webkit-mask-image:linear-gradient(180deg,transparent 4%,#000 34%,#000 100%);mask-image:linear-gradient(180deg,transparent 4%,#000 34%,#000 100%);}
+    .final > *{position:relative;z-index:1;}
+    .final h2{font-family:var(--display);font-weight:800;letter-spacing:-.04em;font-size:clamp(38px,6vw,84px);line-height:.98;color:#fff;margin:18px auto 0;max-width:15ch;}
+    .final p{color:rgba(255,255,255,.85);font-size:18px;margin:24px auto 34px;max-width:540px;}
+    .final .cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+    .final .cta{background:#fff;color:var(--cobalt);box-shadow:0 16px 44px rgba(0,0,0,.22);}
+    .final .cta:hover{background:#eaf0ff;}
+    footer{position:relative;overflow:hidden;color:var(--soft);background:linear-gradient(180deg, var(--cobalt-d) 0%, #0c1c54 26%, #08123a 60%, #050d28 100%);}
+    footer::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:54px 54px;-webkit-mask-image:radial-gradient(120% 80% at 50% 0%, #000 0%, transparent 70%);mask-image:radial-gradient(120% 80% at 50% 0%, #000 0%, transparent 70%);}
+    footer::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.4;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+    footer > *{position:relative;z-index:1;}
+    .foot-grid{max-width:1200px;margin:0 auto;padding:66px 40px 40px;display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:40px;}
+    .foot-brand .brand{display:flex;align-items:center;gap:9px;font-family:var(--display);font-size:19px;font-weight:600;color:#fff;margin-bottom:14px;letter-spacing:-.02em;}
+    .foot-brand p{color:var(--soft);font-size:14px;line-height:1.6;max-width:290px;margin:0;}
+    .foot-col h5{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--soft2);margin:0 0 16px;font-weight:500;}
+    .foot-col a{display:block;color:var(--soft);font-size:14px;margin-bottom:11px;}
+    .foot-col a:hover{color:#fff;}
+    .foot-bottom{border-top:1px solid var(--line-d);}
+    .foot-bottom-in{max-width:1200px;margin:0 auto;padding:22px 40px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--soft2);flex-wrap:wrap;gap:10px;}
+    @media(max-width:780px){.foot-grid{grid-template-columns:1fr 1fr;gap:30px;}}
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav class="nav" id="nav"><div class="nav-in">
+    <div class="brand">
+      <svg width="22" height="22" viewBox="0 0 640 640" fill="#2F62FF" aria-hidden><path d="M333.4 66.9C329.2 65 324.7 64 320 64C315.3 64 310.8 65 306.6 66.9L118.3 146.8C96.3 156.1 79.9 177.8 80 204C80.5 303.2 121.3 484.7 293.6 567.2C310.3 575.2 329.7 575.2 346.4 567.2C518.8 484.7 559.6 303.2 560 204C560.1 177.8 543.7 156.1 521.7 146.8L333.4 66.9zM313.6 247.5L320 256L326.4 247.5C337.5 232.7 354.9 224 373.3 224C405.7 224 432 250.3 432 282.7L432 288C432 337.1 366.2 386.1 335.5 406.3C326 412.5 314 412.5 304.6 406.3C273.9 386.1 208.1 337 208.1 288L208.1 282.7C208.1 250.3 234.4 224 266.8 224C285.3 224 302.7 232.7 313.7 247.5z"/></svg>
+      <span>governr</span>
+    </div>
+    <div class="nav-links"><a href="#how">Platform</a><a href="#who">Solutions</a><a href="#faq">Resources</a><a href="#" class="cta">Book a demo</a></div>
+  </div></nav>
+
+  <!-- HERO -->
+  <section class="hero"><div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">AI Atlas · live governance radar</span>
+      <h1>AI is running your business. <span class="c">You just can't see it.</span></h1>
+      <p class="sub">Most firms are blind to 60 to 70% of the AI inside them. Regulators are not waiting, and the board is asking. governr maps every AI asset into one live Atlas, audit-ready in two hours.</p>
+      <div class="cta-row">
+        <a href="#" class="cta">Book a demo <svg class="arr" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a href="#how" class="cta ghost l">See how it works</a>
+      </div>
+    </div>
+    <div class="radar"><canvas id="radar"></canvas>
+      <div class="atlas-card">
+        <div class="ac-top"><span class="ld"></span>AI estate · live</div>
+        <div class="ac-stats"><div><b>131</b><span>assets</span></div><div><b class="r">7</b><span>high risk</span></div><div><b>2m</b><span>last scan</span></div></div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- TRUST -->
+  <div class="credband"><div class="credband-in">
+    <span class="cred-label">Built by operators from</span>
+    <div class="marquee"><div class="track" id="track"></div></div>
+  </div></div>
+
+  <!-- PROBLEM (editorial) -->
+  <section class="band paper pad"><div class="wrap editorial">
+    <span class="eyebrow">The problem</span>
+    <p class="big">You have a policy. <span class="mut">You don't have proof.</span></p>
+    <p class="sub">Policies and questionnaires tell you what should be happening. They don't tell you what AI is actually running, what changed yesterday, or whether you can defend your next deployment to a regulator.</p>
+    <div class="three">
+      <div class="it"><span class="n">01</span><h4>One broken API</h4><p>A model update, an agent exceeding its permissions, a vendor swapping a backend. You wouldn't know until something breaks.</p></div>
+      <div class="it"><span class="n">02</span><h4>Proof in one business day</h4><p>If you can't produce evidence of authorised AI and control over material changes within a day, you don't have control. You have documentation.</p></div>
+      <div class="it"><span class="n">03</span><h4>The obligations are live</h4><p>EU AI Act, DORA, FCA, FINRA. The rules already apply. The only question is whether your evidence is current.</p></div>
+    </div>
+  </div></section>
+
+  <!-- WHAT IS THE AI ATLAS -->
+  <section class="band ink pad"><div class="wrap">
+    <span class="eyebrow">What is the AI Atlas?</span>
+    <h2>Your single source of truth <span class="accent">for every AI system.</span></h2>
+    <p class="lead">The governr AI Atlas maps your entire AI network, connecting assets, vendors, data flows, and dependencies into one living view. You always know what is running, who owns it, what data it touches, and what risk it carries.</p>
+    <div class="atlasgrid">
+      <div class="ag"><div class="agn">01</div><h4>Complete visibility</h4><p>See every AI system, including the ones no one told you about.</p></div>
+      <div class="ag"><div class="agn">02</div><h4>Instant audit-readiness</h4><p>Your full inventory, risk scores, and control evidence in one place, ready when the regulator calls.</p></div>
+      <div class="ag"><div class="agn">03</div><h4>Connected context</h4><p>See how every asset links to your data, processes, and third parties, so you understand the real blast radius of any change.</p></div>
+      <div class="ag"><div class="agn">04</div><h4>Always current</h4><p>Not a one-off spreadsheet. The Atlas updates continuously as your AI landscape evolves.</p></div>
+    </div>
+  </div></section>
+
+  <!-- HOW IT WORKS (Command/Assess/Monitor/Report) -->
+  <section class="band paper pad" id="how"><div class="wrap">
+    <span class="eyebrow">The platform</span>
+    <h2>Command. Assess. Monitor. <span class="accent">Report.</span></h2>
+    <p class="lead">One connected layer that turns a sprawling, invisible AI estate into something you can steer across risk, performance, cost, and value.</p>
+
+    <div class="feat">
+      <div class="feat-copy"><span class="ix">01 — Command</span><h3>See what's actually running</h3><p>Every vendor, agent, dataset, and dependency connected in one view. If it touches your data, it's in governr, including the AI you never approved.</p><div class="tags"><span class="tag">Network graph</span><span class="tag">Shadow AI</span><span class="tag">Read-only</span></div></div>
+      <div class="feat-art"><div class="art"><div class="ahead"><span class="d" style="background:var(--cobalt-l)"></span><span class="t">atlas · estate graph</span><span class="badge net-hint">drag to explore</span></div><canvas class="net" id="netCanvas"></canvas><div class="alabel">Connected AI network graph · every asset, every dependency</div></div></div>
+    </div>
+
+    <div class="feat">
+      <div class="feat-copy"><span class="ix">02 — Assess</span><h3>Know your real exposure</h3><p>A 60-factor risk score per asset, with financial exposure quantified in £ and $, not traffic lights. Scored continuously, in the context of your business.</p><div class="tags"><span class="tag">60 factors</span><span class="tag">£/$ exposure</span><span class="tag">Control gaps</span></div></div>
+      <div class="feat-art"><div class="art"><div class="ahead"><span class="d" style="background:var(--amber)"></span><span class="t">atlas · risk score</span></div><div class="risk">
+        <div class="risk-row"><span class="rl">Data privacy</span><span class="rt"><span class="rf" style="width:82%;background:var(--red)"></span></span><span class="rv">82</span></div>
+        <div class="risk-row"><span class="rl">Compliance</span><span class="rt"><span class="rf" style="width:74%;background:var(--amber)"></span></span><span class="rv">74</span></div>
+        <div class="risk-row"><span class="rl">System safety</span><span class="rt"><span class="rf" style="width:61%;background:var(--amber)"></span></span><span class="rv">61</span></div>
+        <div class="risk-row"><span class="rl">Op. resilience</span><span class="rt"><span class="rf" style="width:55%;background:var(--cobalt-l)"></span></span><span class="rv">55</span></div>
+        <div class="risk-row"><span class="rl">Supply chain</span><span class="rt"><span class="rf" style="width:42%;background:var(--green)"></span></span><span class="rv">42</span></div>
+      </div><div class="alabel">Dynamic risk scoring across 6 critical dimensions</div></div></div>
+    </div>
+
+    <div class="feat">
+      <div class="feat-copy"><span class="ix">03 — Monitor</span><h3>Know before your regulator does</h3><p>Continuous, independent surveillance of every AI asset. Breaches, model updates, and regulatory changes flagged in real time, not discovered in your next audit.</p><div class="tags"><span class="tag">Live</span><span class="tag">Signal triage</span><span class="tag">Cost + usage</span></div></div>
+      <div class="feat-art"><div class="art"><div class="ahead"><span class="d" style="background:var(--green)"></span><span class="t">atlas · monitor</span><span class="badge">last scan 2m</span></div><div class="mon">
+        <div class="mon-row"><span class="dot" style="background:var(--green)"></span>GPT-4 Production<span class="st" style="color:var(--green)">HEALTHY</span></div>
+        <div class="mon-row"><span class="dot" style="background:var(--amber)"></span>Claude API<span class="st" style="color:var(--amber)">DEGRADED</span></div>
+        <div class="mon-row"><span class="dot" style="background:var(--green)"></span>Agent Workflow<span class="st" style="color:var(--green)">HEALTHY</span></div>
+        <div class="mon-row"><span class="dot" style="background:var(--red)"></span>Third-party Analytics<span class="st" style="color:var(--red)">CRITICAL</span></div>
+        <div class="mon-row"><span class="dot" style="background:var(--amber)"></span>Model Drift Alert<span class="st" style="color:var(--amber)">WARNING</span></div>
+      </div><div class="alabel">Real-time monitoring across all AI assets</div></div></div>
+    </div>
+
+    <div class="feat">
+      <div class="feat-copy"><span class="ix">04 — Report</span><h3>Answer the examiner in 30 minutes, not 30 days</h3><p>Audit-ready evidence across 15+ regulatory frameworks, auto-updated and board-ready on day one.</p><div class="tags"><span class="tag">15+ frameworks</span><span class="tag">Board-ready</span><span class="tag">Auto-updated</span></div></div>
+      <div class="feat-art"><div class="art"><div class="ahead"><span class="d" style="background:var(--cobalt-l)"></span><span class="t">atlas · report</span></div><div class="fwk"><span data-jur="eu">EU AI Act</span><span data-jur="eu">DORA</span><span data-jur="uk">FCA</span><span data-jur="us">FINRA</span><span data-jur="sg">MAS</span><span data-jur="us">SEC</span><span data-jur="us">OCC</span><span data-jur="us">HIPAA</span><span data-jur="gl">ISO 42001</span><span data-jur="gl">OWASP</span><span data-jur="us">FDA</span><span data-jur="us">DOJ</span></div><div class="alabel">Pre-built compliance mappings for regulated industries</div></div></div>
+    </div>
+  </div></section>
+
+  <!-- TWO HOURS TIMELINE -->
+  <section class="band ink pad"><div class="wrap">
+    <span class="eyebrow">How fast</span>
+    <h2>Your AI Atlas. <span class="accent">In two hours.</span></h2>
+    <p class="lead">Read-only and API-led, so nothing changes in your infrastructure. Most firms find their first surprise inside the first hour.</p>
+    <div class="timeline">
+      <div class="tl"><span class="node"></span><div class="time">Hour 0</div><h4>Connect</h4><p>Read-only, API-led connections to the systems you already run. No agents to install, no data movement.</p></div>
+      <div class="tl"><span class="node"></span><div class="time">Hour 1</div><h4>Discovery sweep</h4><p>governr maps internal builds, bought-in tools, third parties, shadow AI, and agents into one connected graph.</p></div>
+      <div class="tl"><span class="node"></span><div class="time">Hour 2</div><h4>Atlas live</h4><p>Risk-scored, financially quantified, and mapped to your obligations. Your first board-ready view.</p></div>
+      <div class="tl live"><span class="node"></span><div class="time">Continuous</div><h4>Always current</h4><p>The Atlas keeps watching. Breaches, drift, and new regulation flagged the moment they land.</p></div>
+    </div>
+  </div></section>
+
+  <!-- BENCHMARK -->
+  <section class="band ink pad"><div class="wrap">
+    <span class="eyebrow">The difference</span>
+    <h2>Coverage you can actually <span class="accent">defend.</span></h2>
+    <div class="bench">
+      <div class="bcopy">
+        <p class="lead">A policy or a yearly audit shows you a snapshot. governr keeps a live, connected view of the whole estate, so you see the AI that never went through approval.</p>
+        <div class="blist">
+          <div class="bitem active"><div class="bar-ind"></div><div><h4>governr, continuous</h4><p>Internal, third-party, shadow, and agentic AI, mapped and re-scanned in real time.</p></div></div>
+          <div class="bitem"><div class="bar-ind"></div><div><h4>Manual inventory</h4></div></div>
+          <div class="bitem"><div class="bar-ind"></div><div><h4>Annual audit</h4></div></div>
+        </div>
+      </div>
+      <div class="chart">
+        <div class="yl">AI estate visibility (%)</div>
+        <div class="plot">
+          <div class="bcol"><div class="bv">95%</div><div class="bbar" data-h="95" style="background:var(--cobalt)"></div></div>
+          <div class="bcol"><div class="bv">40%</div><div class="bbar" data-h="40" style="background:#cbd2dd"></div></div>
+          <div class="bcol"><div class="bv">30%</div><div class="bbar" data-h="30" style="background:#cbd2dd"></div></div>
+        </div>
+        <div class="blabels"><span>governr</span><span>Manual inventory</span><span>Annual audit</span></div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- PROOF -->
+  <section class="band paper pad"><div class="wrap">
+    <span class="eyebrow">The proof</span>
+    <h2>The question isn't whether your regulator will ask. <span class="accent">It's whether you'll be ready.</span></h2>
+    <div class="proofgrid">
+      <div class="ps"><div class="v">80%+</div><div class="l">of independent software vendors will have generative AI embedded in their applications by 2026, up from less than 5% today</div><div class="src">Gartner, 2024</div></div>
+      <div class="ps"><div class="v">2x</div><div class="l">third-party involvement in breaches doubled year on year, from 15% to 30%</div><div class="src">Verizon 2025 Data Breach Investigations Report</div></div>
+      <div class="ps"><div class="v">40%</div><div class="l">of enterprises will hit a security or compliance incident tied to unauthorised shadow AI by 2030</div><div class="src">Gartner, 2025</div></div>
+    </div>
+    <div class="quote-art">
+      <div class="mark">"</div>
+      <div>
+        <blockquote>governr tackles the main emerging security problem in AI: the irreversible shift of agency from humans to machines. Every firm must understand how their AI could go rogue and put controlling processes in place sophisticated enough to keep it in check. Without it, control will be lost.</blockquote>
+        <div class="by">Dr Roland W Tegeder · CEO, Hologen AI · trusted by banks, hedge funds, and regulated firms in London and New York</div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- PERSONAS -->
+  <section class="band ink pad" id="who"><div class="wrap">
+    <span class="eyebrow">Who it's for</span>
+    <h2>Built for the people accountable <span class="accent">when AI goes wrong.</span></h2>
+    <div class="personas">
+      <div class="pcell"><div class="role">CRO &amp; Board</div><h3>One dashboard. Every asset. Every score.</h3><p>The board will ask what AI you have and how exposed you are. If you hesitate, you've lost the room. governr gives you the answer in real time.</p></div>
+      <div class="pcell"><div class="role">Compliance &amp; Legal</div><h3>Map every system to every obligation</h3><p>Regulations are multiplying and your AI landscape is expanding. governr maps each system to its applicable obligations and alerts you before the auditor finds the gap.</p></div>
+      <div class="pcell"><div class="role">Model &amp; Third-party Risk</div><h3>Verify vendor AI, before and after</h3><p>Every vendor says their AI is enterprise-ready. governr gives you independent, quantified risk scores before you adopt and continuously after you deploy.</p></div>
+      <div class="pcell"><div class="role">AI &amp; Tech Teams</div><h3>Ship faster, with evidence</h3><p>Your best AI projects are stuck in compliance review. governr gives risk and legal the evidence they need to say yes faster.</p></div>
+    </div>
+  </div></section>
+
+  <!-- SECURITY STRIP -->
+  <section class="band paper pad"><div class="wrap">
+    <span class="eyebrow">Security &amp; architecture</span>
+    <h2>An independent layer <span class="accent">above your stack.</span></h2>
+    <p class="lead">Neutral, read-only, and API-led. governr sits over everything you already run, with no agents and no data movement.</p>
+    <div class="secstrip">
+      <div class="sc"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l7 3v5c0 5-3 7.5-7 9-4-1.5-7-4-7-9V6z"/></svg><h4>Read-only by design</h4><p>governr observes. It never writes to your systems or moves your data.</p></div>
+      <div class="sc"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h10"/></svg><h4>API-led discovery</h4><p>Connects to the systems you already run. No agents to install, live in two hours.</p></div>
+      <div class="sc"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><h4>Evidence you can defend</h4><p>Every score and control mapped to a source, ready for the regulator.</p></div>
+      <div class="sc"><svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/></svg><h4>Value in weeks</h4><p>First value in the first couple of weeks, not a six-month programme.</p></div>
+    </div>
+  </div></section>
+
+  <!-- INTEGRATIONS (heading + vertical logo tickers) -->
+  <section class="band ink pad"><div class="wrap">
+    <div class="integ2">
+      <div class="icopy">
+        <span class="eyebrow">Fully integrated</span>
+        <h2>Built to work with <span class="accent">your systems.</span></h2>
+        <p class="lead">governr operates across the tools you already run, connecting cloud, models, vendors, and data into one read-only layer. We never force you to migrate off your systems, and there is nothing to rip out.</p>
+        <a href="#" class="cta">Book a demo <svg class="arr" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="tickers">
+        <div class="tcol"><div class="tlist" data-col="0"></div></div>
+        <div class="tcol"><div class="tlist" data-col="1"></div></div>
+        <div class="tcol"><div class="tlist" data-col="2"></div></div>
+      </div>
+    </div>
+  </div></section>
+
+  <!-- FAQ -->
+  <section class="band paper" style="padding:96px 0 120px" id="faq"><div class="wrap">
+    <span class="eyebrow">FAQ</span>
+    <h2>Frequently asked <span class="accent">questions</span></h2>
+    <div class="faq">
+      <details open><summary>What is governr?</summary><p>governr is an AI risk and oversight platform for enterprises that need continuous visibility across internal and third-party AI. It maintains a living AI inventory, applies contextual risk scoring across apps, agents, models, and plugins, and continuously monitors change so your evidence stays current.</p></details>
+      <details><summary>What counts as an AI asset?</summary><p>Anything in your organisation that creates AI exposure or makes AI-driven decisions: models, agents, AI-enabled workflows, vendor tools with embedded AI, prompt repositories, datasets used by AI, and API integrations that send data to AI services.</p></details>
+      <details><summary>How does governr discover shadow and vendor AI?</summary><p>governr maps your estate through read-only, API-led connections to the systems you already run, then layers in vendor and third-party signals. It surfaces the AI that never went through a formal approval, including agentic tools and embedded vendor models.</p></details>
+      <details><summary>How long does it take to get value?</summary><p>Most firms have a live Atlas within two hours and find their first surprise inside the first hour. No six-month programme, and no changes to your infrastructure.</p></details>
+      <details><summary>Which frameworks does governr map to?</summary><p>15+ regulatory frameworks including the EU AI Act, DORA, FCA, FINRA, MAS, SEC, OCC, HIPAA, ISO 42001, and OWASP, with mappings auto-updated as obligations evolve.</p></details>
+    </div>
+  </div></section>
+
+  <!-- FINAL CTA -->
+  <section class="band cobalt final">
+    <span class="eyebrow" style="color:rgba(255,255,255,.8)">See it for yourself</span>
+    <h2>See what AI is actually running in your business.</h2>
+    <p>Most firms find their first surprise inside the first hour. Book a walkthrough and we'll map a slice of your estate live.</p>
+    <div class="cta-row">
+      <a href="#" class="cta">Book a demo <svg class="arr" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a href="#" class="cta ghost l">Talk to the team</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="brand">
+          <svg width="20" height="20" viewBox="0 0 640 640" fill="#2F62FF" aria-hidden><path d="M333.4 66.9C329.2 65 324.7 64 320 64C315.3 64 310.8 65 306.6 66.9L118.3 146.8C96.3 156.1 79.9 177.8 80 204C80.5 303.2 121.3 484.7 293.6 567.2C310.3 575.2 329.7 575.2 346.4 567.2C518.8 484.7 559.6 303.2 560 204C560.1 177.8 543.7 156.1 521.7 146.8L333.4 66.9z"/></svg>
+          <span>governr</span>
+        </div>
+        <p>Independent AI governance for regulated firms. See it, price it, watch it, prove it.</p>
+      </div>
+      <div class="foot-col"><h5>Platform</h5><a href="#how">AI Atlas</a><a href="#how">Command</a><a href="#how">Assess</a><a href="#how">Monitor</a><a href="#how">Report</a></div>
+      <div class="foot-col"><h5>Solutions</h5><a href="#who">CRO &amp; Board</a><a href="#who">Compliance &amp; Legal</a><a href="#who">Model Risk</a><a href="#who">AI &amp; Tech</a></div>
+      <div class="foot-col"><h5>Company</h5><a href="#">Team</a><a href="#">Resources</a><a href="#faq">FAQ</a><a href="#">Contact</a><a href="#">Book a demo</a></div>
+    </div>
+    <div class="foot-bottom"><div class="foot-bottom-in">
+      <span>© 2026 governr. All rights reserved.</span>
+      <span>Privacy · Terms · Security</span>
+    </div></div>
+  </footer>
+
+  <script>
+  /* nav solidify on scroll */
+  const nav=document.getElementById("nav");
+  addEventListener("scroll",()=>{nav.classList.toggle("solid",scrollY>40);},{passive:true});
+
+  /* ---- hero radar ---- */
+  (function(){
+    const cv=document.getElementById("radar"); if(!cv) return; const cx=cv.getContext("2d");
+    const RING="47,98,255", SWEEP="47,98,255", LABEL="231,238,247";
+    const COL={info:"#2F62FF",ok:"#13C892",warn:"#FF951A",crit:"#F5314A"};
+    const BLIPS=[{a:-62,r:.8,c:"info",t:"Scanning · 2m ago"},{a:-12,r:.9,c:"warn",t:""},{a:22,r:.5,c:"ok",t:"Audited"},{a:58,r:.74,c:"crit",t:"Model drift"},{a:108,r:.4,c:"ok",t:""},{a:150,r:.6,c:"warn",t:"Shadow agent"},{a:202,r:.7,c:"crit",t:"Vendor AI"},{a:250,r:.46,c:"info",t:"New asset"}];
+    let W,H,DPR=Math.min(2,window.devicePixelRatio||1),th=0;
+    function rs(){const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);}
+    new ResizeObserver(rs).observe(cv);rs();
+    function fr(){
+      const cxp=W/2,cyp=H/2,R=Math.min(W,H)*.46;cx.clearRect(0,0,W,H);cx.lineWidth=1;
+      for(let i=1;i<=5;i++){cx.beginPath();cx.arc(cxp,cyp,R*i/5,0,7);cx.strokeStyle=`rgba(${RING},${0.09+0.04*i})`;cx.stroke();}
+      cx.strokeStyle=`rgba(${RING},.12)`;cx.beginPath();cx.moveTo(cxp-R,cyp);cx.lineTo(cxp+R,cyp);cx.moveTo(cxp,cyp-R);cx.lineTo(cxp,cyp+R);cx.moveTo(cxp-R*.707,cyp-R*.707);cx.lineTo(cxp+R*.707,cyp+R*.707);cx.moveTo(cxp+R*.707,cyp-R*.707);cx.lineTo(cxp-R*.707,cyp+R*.707);cx.stroke();
+      cx.save();cx.beginPath();cx.arc(cxp,cyp,R,0,7);cx.clip();const g=cx.createConicGradient(th,cxp,cyp);g.addColorStop(0,`rgba(${SWEEP},0)`);g.addColorStop(.86,`rgba(${SWEEP},0)`);g.addColorStop(1,`rgba(${SWEEP},.34)`);cx.fillStyle=g;cx.fillRect(cxp-R,cyp-R,R*2,R*2);cx.strokeStyle=`rgba(${SWEEP},.65)`;cx.lineWidth=1.5;cx.beginPath();cx.moveTo(cxp,cyp);cx.lineTo(cxp+Math.cos(th)*R,cyp+Math.sin(th)*R);cx.stroke();cx.restore();
+      const cg=cx.createRadialGradient(cxp,cyp,0,cxp,cyp,R*.42);cg.addColorStop(0,`rgba(${SWEEP},.45)`);cg.addColorStop(1,`rgba(${SWEEP},0)`);cx.fillStyle=cg;cx.beginPath();cx.arc(cxp,cyp,R*.42,0,7);cx.fill();cx.beginPath();cx.arc(cxp,cyp,3.5,0,7);cx.fillStyle=`rgba(${SWEEP},1)`;cx.fill();
+      cx.font="11px 'Chivo Mono',monospace";cx.textBaseline="middle";
+      for(const b of BLIPS){const aa=b.a*Math.PI/180,bx=cxp+Math.cos(aa)*R*b.r,by=cyp+Math.sin(aa)*R*b.r,col=COL[b.c];let dd=((th-aa)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);const near=dd<0.6?1-dd/0.6:0;cx.save();cx.shadowColor=col;cx.shadowBlur=7+near*12;cx.beginPath();cx.arc(bx,by,3+near*1.6,0,7);cx.fillStyle=col;cx.fill();cx.restore();if(b.t){const left=bx>=cxp;cx.textAlign=left?"left":"right";cx.fillStyle=`rgba(${LABEL},${0.5+near*0.45})`;cx.fillText(b.t,left?bx+9:bx-9,by);}}
+      th+=0.012;if(th>2*Math.PI)th-=2*Math.PI;requestAnimationFrame(fr);
+    }
+    requestAnimationFrame(fr);
+  })();
+
+  /* ---- logo carousel ---- */
+  (function(){
+    const LOGOS=[{img:"logos/baml_w.png",alt:"Bank of America"},{img:"logos/hsbc_step.png",alt:"HSBC"},{txt:"Capco"},{img:"logos/goldman_w.png",alt:"Goldman Sachs"},{img:"logos/deutsche_full_w.png",alt:"Deutsche Bank"},{img:"logos/morgan_w.png",alt:"Morgan Stanley"},{img:"logos/accenture_w.png",alt:"Accenture"}];
+    const track=document.getElementById("track"); if(!track) return;
+    const h=LOGOS.map(l=>l.img?`<span class="lg"><img src="${l.img}" alt="${l.alt}"></span>`:`<span class="lg"><span class="txt">${l.txt}</span></span>`).join("");
+    track.innerHTML=h+h;
+  })();
+
+  /* ---- estate cluster (Command panel) · 3D drag-to-rotate ---- */
+  (function(){
+    const cv=document.getElementById("netCanvas"); if(!cv) return; const cx=cv.getContext("2d");
+    const TYPES=["#2F62FF","#7C5CFF","#13C892","#FF951A","#F23DA0","#2F62FF"];
+    const N=64; let W,H,DPR=Math.min(2,window.devicePixelRatio||1);
+    let aX=-0.35,aY=0.4,velX=0,velY=0,dragging=false,last=null;
+    const pts=[],edges=[];
+    (function build(){
+      // a few dense cores, nodes scattered through the 3D volume around them -> real cluster, not a shell
+      const cores=[[0,0,0],[.5,.32,-.25],[-.45,-.3,.3],[.15,-.5,.4],[-.3,.45,-.4]];
+      for(let i=0;i<N;i++){
+        const c=cores[i%cores.length];
+        let x,y,z,d2; do{x=(Math.random()*2-1);y=(Math.random()*2-1);z=(Math.random()*2-1);d2=x*x+y*y+z*z;}while(d2>1);
+        const sp=0.46; // spread around the core
+        pts.push({x:c[0]+x*sp,y:c[1]+y*sp,z:c[2]+z*sp,c:TYPES[i%TYPES.length],s:(i%9===0)?3.6:2.1,hub:i%9===0});
+      }
+      for(let i=0;i<N;i++){
+        const d=pts.map((p,j)=>({j,dd:(p.x-pts[i].x)**2+(p.y-pts[i].y)**2+(p.z-pts[i].z)**2})).filter(o=>o.j!==i).sort((a,b)=>a.dd-b.dd);
+        const k=pts[i].hub?5:3;
+        for(let m=0;m<k;m++){const a=i,b=d[m].j;if(!edges.some(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a)))edges.push({a,b});}
+      }
+    })();
+    function rs(){const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0);}
+    new ResizeObserver(rs).observe(cv);rs();
+    function pos(ev){const r=cv.getBoundingClientRect();return{x:ev.clientX-r.left,y:ev.clientY-r.top};}
+    cv.addEventListener("pointerdown",ev=>{dragging=true;last=pos(ev);velX=velY=0;cv.setPointerCapture(ev.pointerId);cv.style.cursor="grabbing";});
+    cv.addEventListener("pointermove",ev=>{const p=pos(ev);if(dragging&&last){const dx=p.x-last.x,dy=p.y-last.y;aY-=dx*0.008;aX+=dy*0.008;velY=-dx*0.008;velX=dy*0.008;last=p;}});
+    function rel(ev){dragging=false;try{cv.releasePointerCapture(ev.pointerId);}catch(e){}cv.style.cursor="grab";}
+    cv.addEventListener("pointerup",rel);cv.addEventListener("pointercancel",rel);cv.addEventListener("pointerleave",()=>{if(!dragging)cv.style.cursor="default";});
+    function proj(p,R,ox,oy){
+      const cy=Math.cos(aY),sy=Math.sin(aY),cxx=Math.cos(aX),sx=Math.sin(aX);
+      const x1=p.x*cy-p.z*sy, z1=p.x*sy+p.z*cy;
+      const y2=p.y*cxx-z1*sx, z2=p.y*sx+z1*cxx;
+      const persp=1.9/(1.9-z2*0.55);
+      return{x:ox+x1*R*persp,y:oy+y2*R*persp,d:(z2+1)/2};
+    }
+    function fr(){
+      cx.clearRect(0,0,W,H);
+      if(!dragging){aY+=velY+0.0018;aX+=velX;velX*=0.93;velY*=0.93;}
+      aX=Math.max(-1.25,Math.min(1.25,aX));
+      const R=Math.min(W,H)*0.4,ox=W/2,oy=H/2;
+      const sp=pts.map(p=>proj(p,R,ox,oy));
+      for(const e of edges){const a=sp[e.a],b=sp[e.b],dd=(a.d+b.d)/2;cx.strokeStyle=`rgba(47,98,255,${0.06+dd*0.22})`;cx.lineWidth=0.6+dd*0.6;cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke();}
+      const order=sp.map((s,i)=>i).sort((i,j)=>sp[i].d-sp[j].d);
+      for(const i of order){const s=sp[i],p=pts[i],rad=p.s*(0.55+s.d*0.7),al=0.4+s.d*0.6;
+        if(p.hub){const g=cx.createRadialGradient(s.x,s.y,0,s.x,s.y,rad*3.2);g.addColorStop(0,p.c+"66");g.addColorStop(1,p.c+"00");cx.fillStyle=g;cx.beginPath();cx.arc(s.x,s.y,rad*3.2,0,7);cx.fill();}
+        cx.save();cx.globalAlpha=al;cx.shadowColor=p.c;cx.shadowBlur=p.hub?13:6;cx.beginPath();cx.arc(s.x,s.y,rad,0,7);cx.fillStyle=p.c;cx.fill();cx.restore();
+        cx.save();cx.globalAlpha=al*0.7;cx.beginPath();cx.arc(s.x,s.y,rad,0,7);cx.strokeStyle="rgba(8,16,34,.5)";cx.lineWidth=1;cx.stroke();cx.restore();}
+      requestAnimationFrame(fr);
+    }
+    cv.style.cursor="grab";requestAnimationFrame(fr);
+  })();
+
+  /* ---- integration tickers ---- */
+  (function(){
+    const COLS=[
+      [["aws","AWS"],["openai","OpenAI"],["salesforce","Salesforce"],["github","GitHub"],["snowflake","Snowflake"],["azure","Azure"]],
+      [["anthropic","Anthropic"],["databricks","Databricks"],["datadog","Datadog"],["slack","Slack"],["vertexai","Vertex AI"],["sap","SAP"]],
+      [["googlecloud","Google Cloud"],["huggingface","Hugging Face"],["bigquery","BigQuery"],["okta","Okta"],["jira","Jira"],["bedrock","Bedrock"]]
+    ];
+    document.querySelectorAll(".tlist").forEach(el=>{
+      const col=COLS[+el.dataset.col]||COLS[0];
+      const h=col.map(([f,nm])=>`<div class="tpill"><span class="ic"><img src="logos/int/${f}.svg" alt=""></span>${nm}</div>`).join("");
+      el.innerHTML=h+h;
+    });
+  })();
+
+  /* ---- jurisdiction flags on report chips ---- */
+  (function(){
+    const F={
+      eu:'<svg viewBox="0 0 18 12"><rect width="18" height="12" fill="#0a3eff"/><g fill="#ffcf3f">'+Array.from({length:12},(_,i)=>{const a=i/12*6.283-1.5708,x=9+Math.cos(a)*3.4,y=6+Math.sin(a)*3.4;return`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r=".7"/>`}).join('')+'</g></svg>',
+      us:'<svg viewBox="0 0 18 12"><rect width="18" height="12" fill="#fff"/><g fill="#b22234"><rect width="18" height="1.7"/><rect y="3.4" width="18" height="1.7"/><rect y="6.8" width="18" height="1.7"/><rect y="10.3" width="18" height="1.7"/></g><rect width="8" height="6.8" fill="#3c3b6e"/></svg>',
+      uk:'<svg viewBox="0 0 18 12"><rect width="18" height="12" fill="#012169"/><path d="M0 0L18 12M18 0L0 12" stroke="#fff" stroke-width="2.6"/><path d="M0 0L18 12M18 0L0 12" stroke="#c8102e" stroke-width="1"/><path d="M9 0V12M0 6H18" stroke="#fff" stroke-width="3.4"/><path d="M9 0V12M0 6H18" stroke="#c8102e" stroke-width="1.8"/></svg>',
+      sg:'<svg viewBox="0 0 18 12"><rect width="18" height="6" fill="#ed2939"/><rect y="6" width="18" height="6" fill="#fff"/><circle cx="4.6" cy="3" r="2.4" fill="#fff"/><circle cx="5.6" cy="3" r="2.1" fill="#ed2939"/></svg>',
+      gl:'<svg viewBox="0 0 18 12"><circle cx="9" cy="6" r="5" fill="none" stroke="#2F62FF" stroke-width="1"/><path d="M4 6h10M9 1.2v9.6M5.4 2.6c2 2.4 2 4.4 0 6.8M12.6 2.6c-2 2.4-2 4.4 0 6.8" stroke="#2F62FF" stroke-width=".7" fill="none"/></svg>'
+    };
+    document.querySelectorAll(".fwk span[data-jur]").forEach(s=>{const f=F[s.dataset.jur];if(f){const i=document.createElement("i");i.className="fl";i.innerHTML=f;s.prepend(i);}});
+  })();
+
+  /* ---- benchmark bar reveal ---- */
+  (function(){
+    const bars=document.querySelectorAll(".chart .bbar"); if(!bars.length) return;
+    const io=new IntersectionObserver((ents)=>{
+      ents.forEach(e=>{if(e.isIntersecting){bars.forEach(b=>{b.style.height=(b.dataset.h)+"%";});io.disconnect();}});
+    },{threshold:.4});
+    io.observe(document.querySelector(".chart"));
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Atlas — the global AI governance radar | governr</title>
+  <meta name="description" content="Atlas watches the global AI landscape and tells you which signals touch your estate, the moment they break." />
+  <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,500,600,700,800&f[]=chivo-mono@400,500&display=swap" rel="stylesheet" />
+  <style>
+    :root{
+      --ink:#000A1A; --ink-2:#04101f; --paper:#F8F8F8; --slate:#5F6470;
+      --cobalt:#0A3EFF; --deep:#10296E; --cyan:#04D9FF;
+      --green:#34D399; --amber:#FBBF24; --red:#FB6A6A;
+      --line-d:rgba(255,255,255,.10); --line-l:rgba(16,41,110,.12);
+      --ink-soft:rgba(231,238,247,.72);
+      --display:'Switzer',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      --mono:'Chivo Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
+    *{box-sizing:border-box;}
+    html,body{margin:0;height:100%;background:var(--paper);}
+    body{font-family:var(--display);color:#0a1424;-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden;}
+
+    /* ================= HERO (ink navy band, full-width globe dome) ================= */
+    .hero{position:relative;height:100vh;min-height:680px;overflow:hidden;background:var(--ink);
+      background-image:
+        radial-gradient(120% 70% at 50% 116%, rgba(4,217,255,.12), rgba(4,217,255,0) 55%),
+        radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size:auto, 26px 26px;}
+
+    .topbar{position:relative;z-index:6;max-width:1200px;margin:0 auto;padding:24px 36px;
+      display:flex;align-items:center;justify-content:space-between;}
+    .brand{display:flex;align-items:center;gap:9px;font-size:21px;font-weight:600;letter-spacing:-.02em;color:#fff;}
+    .nav{display:flex;gap:30px;align-items:center;}
+    .nav a{color:var(--ink-soft);text-decoration:none;font-size:14.5px;font-weight:500;}
+    .nav a:hover{color:#fff;}
+    .nav .cta-sm{color:#fff;background:var(--cobalt);padding:9px 17px;border-radius:4px;font-weight:600;}
+    .nav .cta-sm:hover{background:#2a55ff;color:#fff;}
+
+    .hero-inner{position:relative;z-index:5;max-width:760px;margin:0 auto;padding:40px 32px 0;text-align:center;}
+    .hero-inner::before{content:"";position:absolute;left:50%;top:-10px;transform:translateX(-50%);
+      width:820px;max-width:96vw;height:380px;z-index:-1;pointer-events:none;
+      background:radial-gradient(60% 60% at 50% 40%, rgba(0,10,26,.82), rgba(0,10,26,0) 72%);}
+    .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);
+      display:inline-flex;align-items:center;gap:9px;}
+    .kicker .live{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:livedot 2s infinite;}
+    @keyframes livedot{0%{box-shadow:0 0 0 0 rgba(4,217,255,.55);}70%{box-shadow:0 0 0 8px rgba(4,217,255,0);}100%{box-shadow:0 0 0 0 rgba(4,217,255,0);}}
+    .hero h1{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height:1.02;color:#fff;
+      font-size:clamp(38px,5.4vw,64px);margin:18px auto 0;max-width:15ch;}
+    .hero h1 .cyan{color:var(--cyan);}
+    .hero .lede{color:var(--ink-soft);font-size:clamp(15px,1.5vw,18px);line-height:1.6;max-width:580px;margin:20px auto 0;}
+    .cta-row{display:flex;gap:13px;justify-content:center;margin-top:28px;flex-wrap:wrap;}
+    .cta{display:inline-flex;align-items:center;gap:9px;background:var(--cobalt);color:#fff;border:none;border-radius:4px;
+      padding:14px 24px;font:inherit;font-weight:600;font-size:15px;cursor:pointer;text-decoration:none;
+      box-shadow:0 10px 30px rgba(10,62,255,.34);transition:transform .14s,box-shadow .16s,background .16s;}
+    .cta:hover{background:#2a55ff;transform:translateY(-1px);box-shadow:0 14px 38px rgba(10,62,255,.46);}
+    .cta-ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.28);box-shadow:none;}
+    .cta-ghost:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.5);transform:translateY(-1px);}
+
+    /* full-width globe dome — only the top third shows */
+    .globe-stage{position:absolute;left:50%;transform:translateX(-50%);
+      top:34vh;width:122vw;max-width:1720px;aspect-ratio:1/1;z-index:1;pointer-events:none;}
+    .globe-stage svg{width:100%;height:100%;overflow:visible;display:block;}
+    .globe-stage::before{content:"";position:absolute;left:50%;top:-3%;transform:translateX(-50%);
+      width:64%;height:22%;border-radius:50%;
+      background:radial-gradient(60% 100% at 50% 60%, rgba(4,217,255,.22), rgba(4,217,255,0) 70%);filter:blur(12px);}
+    .grid-line{fill:none;stroke:var(--cyan);stroke-width:1;opacity:.24;}
+    .grid-line.major{opacity:.42;stroke-width:1.3;}
+    .grid-rim{fill:none;stroke:var(--cyan);stroke-width:2.2;opacity:.88;filter:drop-shadow(0 0 8px rgba(4,217,255,.6));}
+    .grid-fill{fill:url(#globeFill);}
+    .sweep{transform-box:fill-box;transform-origin:center bottom;animation:sweepspin 16s ease-in-out infinite;}
+    @keyframes sweepspin{0%{transform:rotate(-40deg);}50%{transform:rotate(40deg);}100%{transform:rotate(-40deg);}}
+    .pulse-ring{fill:none;stroke-width:1.5;transform-box:fill-box;transform-origin:center;animation:ring 3.6s ease-out infinite;}
+    @keyframes ring{0%{transform:scale(.2);opacity:.9;}70%{opacity:.18;}100%{transform:scale(1.05);opacity:0;}}
+    .node-core{animation:beat 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center;}
+    @keyframes beat{0%,100%{transform:scale(1);}50%{transform:scale(1.4);}}
+    .leader{stroke:rgba(4,217,255,.5);stroke-width:1;fill:none;stroke-dasharray:3 4;}
+    .leader-dot{fill:var(--cyan);}
+
+    /* radar event tags (Chivo Mono, product-UI style) */
+    .overlay{position:absolute;inset:0;z-index:3;pointer-events:none;}
+    .tag{position:absolute;pointer-events:auto;font-family:var(--mono);width:212px;
+      background:rgba(2,11,26,.84);border:1px solid var(--line-d);border-radius:4px;padding:8px 11px;
+      backdrop-filter:blur(5px);box-shadow:0 12px 32px rgba(0,4,12,.5);
+      opacity:0;transition:opacity .35s ease;}
+    @keyframes tagin{to{opacity:1;transform:translateY(0);}}
+    .tag .row1{display:flex;align-items:center;gap:7px;}
+    .tag .dot{width:7px;height:7px;border-radius:50%;flex:none;}
+    .tag .region{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(231,238,247,.6);}
+    .tag .sev{margin-left:auto;font-size:9px;font-weight:500;padding:1px 6px;border-radius:4px;}
+    .tag .head{font-family:var(--display);font-weight:500;font-size:12.5px;line-height:1.32;color:#eef4fb;margin-top:5px;}
+    .tag .match{font-size:9.5px;color:var(--cyan);margin-top:5px;}
+    .sev.high{color:var(--red);background:rgba(251,106,106,.14);}
+    .sev.med{color:var(--amber);background:rgba(251,191,36,.14);}
+    .sev.low{color:var(--green);background:rgba(52,211,153,.14);}
+
+    @media(max-width:900px){.nav{display:none;}.globe-stage{top:42vh;width:170vw;}.tag{width:168px;}}
+    @media(max-width:560px){.tag.hideSmall{display:none;}}
+
+    /* ================= COBALT CREDIBILITY BAND ================= */
+    .credband{background:var(--cobalt);overflow:hidden;}
+    .credband-in{max-width:1280px;margin:0 auto;padding:20px 36px;display:flex;align-items:center;gap:30px;}
+    .cred-label{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);}
+    .marquee{position:relative;flex:1;overflow:hidden;
+      -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+      mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);}
+    .marquee:hover .track{animation-play-state:paused;}
+    .track{display:flex;align-items:center;gap:64px;width:max-content;animation:scrollx 24s linear infinite;}
+    .track .lg{display:flex;align-items:center;justify-content:center;height:30px;}
+    .track .lg img{height:23px;width:auto;max-width:122px;object-fit:contain;display:block;opacity:.95;}
+    .track .lg .txt{font-family:var(--display);font-weight:700;font-size:20px;color:#fff;letter-spacing:-.01em;opacity:.96;}
+    .track .lg .hsbc-grad{height:22px;aspect-ratio:2308/623;
+      background:linear-gradient(180deg,#ffffff 28%,#9db8ff 100%);
+      -webkit-mask:url(logos/hsbc_w.png) center/contain no-repeat;mask:url(logos/hsbc_w.png) center/contain no-repeat;}
+    @keyframes scrollx{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    @media(max-width:760px){.cred-label{display:none;}}
+
+    /* ================= LIGHT SECTIONS (paper) ================= */
+    .sec{max-width:1120px;margin:0 auto;padding:104px 36px;}
+    .sec-kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cobalt);}
+    .sec h2{font-family:var(--display);font-weight:700;letter-spacing:-.03em;line-height:1.06;color:#070d18;
+      font-size:clamp(28px,3.6vw,44px);margin:13px 0 0;max-width:18ch;}
+    .sec h2 .cobalt{color:var(--cobalt);}
+    .sec-sub{color:var(--slate);font-size:16.5px;line-height:1.6;max-width:560px;margin:16px 0 0;}
+    .prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:46px;}
+    .prob{background:#fff;border:1px solid var(--line-l);border-radius:4px;padding:26px;
+      box-shadow:0 1px 2px rgba(16,41,110,.04);transition:transform .16s,box-shadow .16s;}
+    .prob:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(16,41,110,.10);}
+    .prob .pn{font-family:var(--mono);font-size:12px;color:var(--cobalt);}
+    .prob h3{font-size:18.5px;font-weight:600;letter-spacing:-.01em;margin:12px 0 9px;color:#0a1322;}
+    .prob p{color:var(--slate);font-size:14.5px;line-height:1.62;margin:0;}
+    .prob p b{color:#10296E;font-weight:600;}
+    .prob .stat{color:var(--cobalt);font-weight:700;}
+    @media(max-width:840px){.prob-grid{grid-template-columns:1fr;}}
+
+    /* ================= INK BAND: see / price / watch ================= */
+    .band{background:var(--ink);color:#fff;
+      background-image:radial-gradient(90% 130% at 50% 0%, rgba(10,62,255,.16), rgba(10,62,255,0) 58%),
+        radial-gradient(rgba(255,255,255,.04) 1px, transparent 1px);background-size:auto,26px 26px;}
+    .band-in{max-width:1120px;margin:0 auto;padding:104px 36px;}
+    .band .sec-kicker{color:var(--cyan);}
+    .band h2{font-family:var(--display);font-weight:700;letter-spacing:-.03em;line-height:1.06;color:#fff;
+      font-size:clamp(28px,3.6vw,44px);margin:13px 0 0;}
+    .band .sec-sub{color:var(--ink-soft);}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px;}
+    .step{position:relative;background:linear-gradient(180deg,rgba(16,41,110,.34),rgba(4,16,31,.5));
+      border:1px solid var(--line-d);border-radius:4px;padding:28px 26px;}
+    .step .si{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+    .step .num{font-family:var(--mono);font-size:13px;color:#fff;background:var(--cobalt);border-radius:4px;
+      width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:500;}
+    .step .stitle{font-size:20px;font-weight:600;letter-spacing:-.01em;}
+    .step .ico{width:44px;height:44px;margin:6px 0 14px;}
+    .step p{color:var(--ink-soft);font-size:14.5px;line-height:1.62;margin:0 0 16px;}
+    .step .ptags{display:flex;flex-wrap:wrap;gap:6px;}
+    .step .pt{font-family:var(--mono);font-size:10.5px;color:var(--cyan);background:rgba(4,217,255,.08);
+      border:1px solid rgba(4,217,255,.18);border-radius:4px;padding:4px 10px;}
+    .step .connect{position:absolute;top:43px;right:-12px;width:24px;height:1px;background:var(--line-d);}
+    @media(max-width:860px){.steps{grid-template-columns:1fr;}.step .connect{display:none;}}
+
+    /* ================= PROOF (paper) ================= */
+    .proof{max-width:1120px;margin:0 auto;padding:104px 36px;text-align:center;}
+    .shorthand{display:inline-flex;gap:9px;align-items:center;font-family:var(--mono);font-size:13px;color:var(--slate);
+      border:1px solid var(--line-l);border-radius:4px;padding:8px 16px;margin-bottom:22px;background:#fff;}
+    .shorthand b{color:var(--cobalt);font-weight:500;}
+    .proof h2{font-family:var(--display);font-weight:700;letter-spacing:-.03em;font-size:clamp(28px,3.6vw,44px);margin:0 auto;max-width:16ch;color:#070d18;line-height:1.06;}
+    .proof h2 .cobalt{color:var(--cobalt);}
+    .proof .sec-sub{margin:16px auto 0;}
+    .statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:50px;text-align:left;}
+    .stat-c{border-left:2px solid var(--cobalt);padding:4px 0 4px 18px;}
+    .stat-c .v{font-family:var(--display);font-weight:700;font-size:34px;letter-spacing:-.025em;color:#0a1322;}
+    .stat-c .v .u{color:var(--cobalt);}
+    .stat-c .l{color:var(--slate);font-size:13px;margin-top:6px;line-height:1.4;}
+    @media(max-width:760px){.statrow{grid-template-columns:repeat(2,1fr);}}
+
+    /* final CTA (ink) */
+    .final{background:var(--ink);color:#fff;text-align:center;padding:108px 36px;
+      background-image:radial-gradient(80% 120% at 50% 120%, rgba(4,217,255,.12), rgba(4,217,255,0) 60%);}
+    .final .sec-kicker{color:var(--cyan);}
+    .final h2{font-family:var(--display);font-weight:700;letter-spacing:-.03em;font-size:clamp(30px,4.2vw,52px);margin:14px auto 0;max-width:16ch;line-height:1.04;}
+    .final h2 .cyan{color:var(--cyan);}
+    .final p{color:var(--ink-soft);font-size:17px;margin:18px auto 30px;max-width:520px;}
+    .final .cta-row{justify-content:center;margin-top:0;}
+    footer{background:var(--ink);border-top:1px solid var(--line-d);}
+    .foot-in{max-width:1120px;margin:0 auto;padding:28px 36px;display:flex;justify-content:space-between;align-items:center;
+      color:var(--ink-soft);font-family:var(--mono);font-size:12px;flex-wrap:wrap;gap:12px;}
+    .foot-in .brand{font-family:var(--display);font-size:16px;}
+  </style>
+</head>
+<body>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <header class="topbar">
+      <div class="brand">
+        <svg width="22" height="22" viewBox="0 0 640 640" fill="#04D9FF" aria-hidden><path d="M333.4 66.9C329.2 65 324.7 64 320 64C315.3 64 310.8 65 306.6 66.9L118.3 146.8C96.3 156.1 79.9 177.8 80 204C80.5 303.2 121.3 484.7 293.6 567.2C310.3 575.2 329.7 575.2 346.4 567.2C518.8 484.7 559.6 303.2 560 204C560.1 177.8 543.7 156.1 521.7 146.8L333.4 66.9zM313.6 247.5L320 256L326.4 247.5C337.5 232.7 354.9 224 373.3 224C405.7 224 432 250.3 432 282.7L432 288C432 337.1 366.2 386.1 335.5 406.3C326 412.5 314 412.5 304.6 406.3C273.9 386.1 208.1 337 208.1 288L208.1 282.7C208.1 250.3 234.4 224 266.8 224C285.3 224 302.7 232.7 313.7 247.5z"/></svg>
+        <span>governr</span>
+      </div>
+      <nav class="nav"><a href="#">Platform</a><a href="#">AI Atlas</a><a href="#">Resources</a><a href="#" class="cta-sm">Book a demo</a></nav>
+    </header>
+
+    <div class="hero-inner">
+      <h1>Every AI risk signal on Earth. <span class="cyan">One live radar.</span></h1>
+      <p class="lede">Atlas watches the global AI landscape: new regulation, breaches, model failures, enforcement actions. It tells you which signals touch <em>your</em> estate, the moment they break.</p>
+      <div class="cta-row">
+        <a href="#" class="cta">Book a demo
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#" class="cta cta-ghost">See how it works</a>
+      </div>
+    </div>
+
+    <div class="globe-stage">
+      <svg id="globe" viewBox="0 0 1000 1000" aria-hidden>
+        <defs>
+          <radialGradient id="globeFill" cx="50%" cy="16%" r="80%">
+            <stop offset="0%" stop-color="#123b78"/><stop offset="52%" stop-color="#0a1d3e"/><stop offset="100%" stop-color="#02060f"/>
+          </radialGradient>
+          <linearGradient id="sweepGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(4,217,255,.42)"/><stop offset="100%" stop-color="rgba(4,217,255,0)"/>
+          </linearGradient>
+          <clipPath id="globeClip"><circle cx="500" cy="500" r="430"/></clipPath>
+        </defs>
+        <g id="globeGroup"></g>
+      </svg>
+    </div>
+
+    <svg class="overlay" id="leaders" preserveAspectRatio="none"></svg>
+    <div class="overlay" id="tags"></div>
+  </section>
+
+  <!-- ============ COBALT CREDIBILITY BAND ============ -->
+  <div class="credband">
+    <div class="credband-in">
+      <span class="cred-label">Built by operators from</span>
+      <div class="marquee"><div class="track" id="track"></div></div>
+    </div>
+  </div>
+
+  <!-- ============ PROBLEM (paper) ============ -->
+  <section class="sec">
+    <span class="sec-kicker">The blind spot</span>
+    <h2>You have a policy. <span class="cobalt">You don't have proof.</span></h2>
+    <p class="sec-sub">We spent this year inside regulated firms, sitting with CROs and CTOs. The same three problems came up every time.</p>
+    <div class="prob-grid">
+      <div class="prob">
+        <span class="pn">01</span>
+        <h3>You can't see the estate</h3>
+        <p>One firm told us they ran <b>five</b> AI systems. We mapped <span class="stat">131</span>. Roughly <b>60-70%</b> of what's running is invisible to the people accountable for it.</p>
+      </div>
+      <div class="prob">
+        <span class="pn">02</span>
+        <h3>Assurance is a snapshot</h3>
+        <p>A system gets signed off, the paperwork freezes, then it drifts. <b>A point-in-time certificate is not live visibility</b> into what is running now.</p>
+      </div>
+      <div class="prob">
+        <span class="pn">03</span>
+        <h3>Risk is argued, not priced</h3>
+        <p>Ten thousand alerts, none of them joined up, and AI risk debated on opinion. Until exposure carries a <b>financial number</b>, the board can't weigh it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INK BAND: see / price / watch ============ -->
+  <section class="band">
+    <div class="band-in">
+      <span class="sec-kicker">How Atlas works</span>
+      <h2>See it. Price it. <span style="color:var(--cyan)">Watch it.</span></h2>
+      <p class="sec-sub">One connected layer that turns a sprawling, invisible AI estate into something you can steer across risk, performance, cost, and value.</p>
+      <div class="steps">
+        <div class="step">
+          <span class="connect"></span>
+          <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#04D9FF" stroke-width="1.6"><circle cx="24" cy="24" r="4"/><circle cx="9" cy="13" r="3"/><circle cx="39" cy="13" r="3"/><circle cx="11" cy="38" r="3"/><circle cx="38" cy="36" r="3"/><path d="M11.5 14.5 20.5 21M36.5 14.5 27.5 21M13 36 21 27M35.5 34 27.5 27"/></svg>
+          <div class="si"><span class="num">01</span><span class="stitle">See the estate</span></div>
+          <p>Map every AI asset, internal builds, bought-in tools, third parties, shadow AI, and agents, as one connected network graph. Read-only and API-led.</p>
+          <div class="ptags"><span class="pt">Network graph</span><span class="pt">Shadow AI</span><span class="pt">Read-only</span></div>
+        </div>
+        <div class="step">
+          <span class="connect"></span>
+          <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#04D9FF" stroke-width="1.6"><path d="M6 30c5 0 5-12 10-12s5 16 10 16 5-20 10-20 4 8 6 8"/><path d="M6 40h36" opacity=".5"/></svg>
+          <div class="si"><span class="num">02</span><span class="stitle">Price the risk</span></div>
+          <p>Score the estate across 60 factors and put a financial number on the operational exposure. Atlas surfaces exactly where controls should be and aren't.</p>
+          <div class="ptags"><span class="pt">60 factors</span><span class="pt">$ exposure</span><span class="pt">Control gaps</span></div>
+        </div>
+        <div class="step">
+          <svg class="ico" viewBox="0 0 48 48" fill="none" stroke="#04D9FF" stroke-width="1.6"><circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="7" opacity=".6"/><path d="M24 8v8M24 32v8M8 24h8M32 24h8"/><circle cx="24" cy="24" r="2.5" fill="#04D9FF" stroke="none"/></svg>
+          <div class="si"><span class="num">03</span><span class="stitle">Watch it live</span></div>
+          <p>Continuous monitoring on usage and cost. Atlas reads the signals your tools already produce and tells you whether to care, what it means, and what to do.</p>
+          <div class="ptags"><span class="pt">Live monitoring</span><span class="pt">Signal triage</span><span class="pt">Cost + usage</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROOF (paper) ============ -->
+  <section class="proof">
+    <span class="shorthand">If you want the shorthand: <b>Wiz</b> + <b>Aladdin</b>, for AI risk.</span>
+    <h2>An independent layer <span class="cobalt">above your stack.</span></h2>
+    <p class="sec-sub">Neutral, read-only, and API-led. Atlas sits over everything you already run and gives value in the first couple of weeks, not a six-month programme.</p>
+    <div class="statrow">
+      <div class="stat-c"><div class="v">~60<span class="u">%</span></div><div class="l">of the AI estate invisible on day one</div></div>
+      <div class="stat-c"><div class="v">60<span class="u">+</span></div><div class="l">risk factors scored per asset</div></div>
+      <div class="stat-c"><div class="v">2<span class="u">wks</span></div><div class="l">to first value, not a long programme</div></div>
+      <div class="stat-c"><div class="v">0</div><div class="l">infra changes, fully read-only</div></div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CTA (ink) ============ -->
+  <section class="final">
+    <span class="sec-kicker">See it for yourself</span>
+    <h2>See what AI is <span class="cyan">actually running</span> in your business.</h2>
+    <p>Most firms find their first surprise inside the first hour. Book a walkthrough and we'll map a slice of your estate live.</p>
+    <div class="cta-row">
+      <a href="#" class="cta">Book a demo
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="#" class="cta cta-ghost">Talk to the team</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-in">
+      <div class="brand">governr</div>
+      <span>Independent AI governance. See it, price it, watch it.</span>
+      <span>© 2026 governr</span>
+    </div>
+  </footer>
+
+  <script>
+  (function(){
+    const NS="http://www.w3.org/2000/svg";
+    const cx=500, cy=500, R=430;
+    const g=document.getElementById("globeGroup");
+    const el=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+
+    g.appendChild(el("circle",{cx,cy,r:R,class:"grid-fill"}));
+    const clipped=el("g",{"clip-path":"url(#globeClip)"});
+    g.appendChild(clipped);
+    for(let lat=-75; lat<=75; lat+=15){
+      const phi=lat*Math.PI/180, rx=R*Math.cos(phi), ry=Math.max(7,R*Math.cos(phi)*0.17), yc=cy-R*Math.sin(phi);
+      clipped.appendChild(el("ellipse",{cx,cy:yc,rx,ry,class:"grid-line"+(lat===0?" major":"")}));
+    }
+    const meridians=[]; const NMER=7;
+    for(let i=0;i<NMER;i++){const base=i*Math.PI/NMER;const me=el("ellipse",{cx,cy,rx:1,ry:R,class:"grid-line"+(i===0?" major":"")});clipped.appendChild(me);meridians.push({e:me,base});}
+    clipped.appendChild(el("path",{d:`M${cx},${cy} L${cx-R*0.46},${cy-R} A${R},${R} 0 0 1 ${cx+R*0.46},${cy-R} Z`,fill:"url(#sweepGrad)",class:"sweep",opacity:".5"}));
+    g.appendChild(el("circle",{cx,cy,r:R,class:"grid-rim"}));
+
+    function project(lat,lon){const phi=lat*Math.PI/180,lam=lon*Math.PI/180;
+      return {x:cx+R*Math.cos(phi)*Math.sin(lam), y:cy-R*Math.sin(phi)};}
+    const COLOR={high:"#FB6A6A",med:"#FBBF24",low:"#34D399"};
+
+    // nodes sit on the visible top cap; tags edge-anchored to the hero, leader lines connect them
+    const EVENTS=[
+      {lat:72,lon:-30,region:"EU",       sev:"high",head:"AI Act · GPAI code now enforceable",    match:"12 assets", side:"left", fy:.30},
+      {lat:54,lon:-58,region:"US",       sev:"high",head:"Colorado SB 24-205 window opens",        match:"9 assets",  side:"left", fy:.58, hideSmall:true},
+      {lat:76,lon:16, region:"UK",       sev:"med", head:"FCA opens AI model-risk consultation",   match:"5 assets",  side:"right",fy:.28},
+      {lat:52,lon:56, region:"Singapore",sev:"low", head:"MAS issues GenAI risk guidelines",       match:"2 assets",  side:"right",fy:.56, hideSmall:true},
+      {lat:46,lon:24, region:"Global",   sev:"high",head:"Frontier breach · vendor in your stack", match:"1 vendor",  side:"right",fy:.80, hideSmall:true},
+    ];
+
+    EVENTS.forEach((ev,i)=>{
+      const p=project(ev.lat,ev.lon); ev._p=p; const c=COLOR[ev.sev];
+      const node=el("g",{}); ev._g=node;
+      for(let k=0;k<3;k++) node.appendChild(el("circle",{cx:p.x,cy:p.y,r:22,class:"pulse-ring",stroke:c,style:`animation-delay:${k*1.2}s`}));
+      node.appendChild(el("circle",{cx:p.x,cy:p.y,r:5.5,fill:c,class:"node-core",style:`filter:drop-shadow(0 0 7px ${c});animation-delay:${i*0.3}s`}));
+      g.appendChild(node);
+    });
+
+    const hero=document.querySelector(".hero");
+    const stage=document.querySelector(".globe-stage");
+    const tagsLayer=document.getElementById("tags");
+    const leaders=document.getElementById("leaders");
+    const TW=212;
+
+    function buildTags(){
+      tagsLayer.innerHTML=""; leaders.innerHTML="";
+      const W=window.innerWidth, H=window.innerHeight;
+      leaders.setAttribute("viewBox",`0 0 ${W} ${H}`);
+      const M=Math.max(22,(W-1200)/2+22);
+      EVENTS.forEach((ev,i)=>{
+        const ax = ev.side==="left" ? M : W-TW-M, ay = ev.fy*H, c=COLOR[ev.sev];
+        const tag=document.createElement("div");
+        tag.className="tag"+(ev.hideSmall?" hideSmall":"");
+        tag.style.left=ax+"px"; tag.style.top=ay+"px";
+        tag.innerHTML=`<div class="row1"><span class="dot" style="background:${c}"></span>
+          <span class="region">${ev.region}</span><span class="sev ${ev.sev}">${ev.sev.toUpperCase()}</span></div>
+          <div class="head">${ev.head}</div><div class="match">↳ matched ${ev.match}</div>`;
+        tagsLayer.appendChild(tag); ev._tag=tag;
+        ev._anchor={x: ev.side==="left" ? ax+TW : ax, y: ay+18};
+        ev._leader=el("path",{class:"leader"});
+        ev._ldot=el("circle",{cx:ev._anchor.x,cy:ev._anchor.y,r:2.4,class:"leader-dot"});
+        leaders.appendChild(ev._leader); leaders.appendChild(ev._ldot);
+      });
+    }
+    let SB=null,SX=1,SY=1;
+    function measure(){SB=stage.getBoundingClientRect();SX=SB.width/1000;SY=SB.height/1000;}
+    buildTags(); measure();
+    window.addEventListener("resize",()=>{buildTags();measure();});
+    window.addEventListener("scroll",measure,{passive:true});
+
+    // ONE loop: spin meridians on the polar axis + orbit the reg-risk pulses, leaders and tags fade past the horizon
+    let t0=null;
+    function frame(t){
+      if(t0===null)t0=t;
+      const th=(t-t0)*0.00012;
+      for(const m of meridians) m.e.setAttribute("rx", Math.max(0.6, Math.abs(R*Math.sin(m.base+th))));
+      if(SB){
+        // pass 1: project every point, record front-to-back depth (z)
+        const proj=EVENTS.map(ev=>{
+          const phi=ev.lat*Math.PI/180, lam=ev.lon*Math.PI/180+th;
+          return {ev,
+            x:cx+R*Math.cos(phi)*Math.sin(lam),
+            y:cy-R*Math.sin(phi),
+            z:Math.cos(phi)*Math.cos(lam)};                         // >0 = front hemisphere
+        });
+        // always keep the 3 frontmost labels visible (floor their opacity)
+        const keep=new Set([...proj].sort((a,b)=>b.z-a.z).slice(0,3).map(o=>o.ev));
+        for(const {ev,x,y,z} of proj){
+          let vis=Math.max(0,Math.min(1,(z+0.05)/0.16));            // fade with the point across the horizon
+          if(keep.has(ev)) vis=Math.max(vis,0.45);                  // min 3 visible
+          ev._g.setAttribute("transform",`translate(${(x-ev._p.x).toFixed(2)},0)`);
+          ev._g.style.opacity=vis;
+          const nx=SB.left+x*SX, ny=SB.top+y*SY;
+          ev._leader.setAttribute("d",`M${ev._anchor.x},${ev._anchor.y} L${nx.toFixed(1)},${ny.toFixed(1)}`);
+          ev._leader.style.opacity=vis; ev._ldot.style.opacity=vis;
+          ev._tag.style.opacity=vis; ev._tag.style.visibility = vis<0.06 ? "hidden" : "visible";
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+    setTimeout(()=>{buildTags();measure();},400);
+
+    // logo carousel (white logos on cobalt) — duplicated set for a seamless loop
+    const LOGOS=[
+      {img:"logos/baml_w.png",alt:"Bank of America Merrill Lynch"},
+      {img:"logos/hsbc_step.png",alt:"HSBC"},
+      {txt:"Capco"},
+      {img:"logos/goldman_w.png",alt:"Goldman Sachs"},
+      {img:"logos/deutsche_full_w.png",alt:"Deutsche Bank"},
+      {img:"logos/morgan_w.png",alt:"Morgan Stanley"},
+      {img:"logos/accenture_w.png",alt:"Accenture"},
+    ];
+    const track=document.getElementById("track");
+    if(track){
+      const html=LOGOS.map(l=>{
+        if(l.img) return `<span class="lg"><img src="${l.img}" alt="${l.alt}"></span>`;
+        return `<span class="lg"><span class="txt">${l.txt}</span></span>`;
+      }).join("");
+      track.innerHTML=html+html; // two copies => -50% loop is seamless
+    }
+  })();
+  </script>
+</body>
+</html>
