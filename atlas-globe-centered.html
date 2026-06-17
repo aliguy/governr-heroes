@@ -97,8 +97,8 @@
       mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);}
     .marquee:hover .track{animation-play-state:paused;}
     .track{display:flex;align-items:center;gap:60px;width:max-content;animation:scrollx 26s linear infinite;}
-    .track .lg{display:flex;align-items:center;justify-content:center;height:30px;}
-    .track .lg img{height:23px;width:auto;max-width:122px;object-fit:contain;display:block;opacity:.95;}
+    .track .lg{display:flex;align-items:center;justify-content:center;height:30px;width:120px;}
+    .track .lg img{max-height:22px;max-width:108px;width:auto;height:auto;object-fit:contain;display:block;opacity:.95;}
     .track .lg .txt{font-family:var(--display);font-weight:700;font-size:20px;color:#fff;letter-spacing:-.01em;opacity:.96;}
     @keyframes scrollx{from{transform:translateX(0);}to{transform:translateX(-50%);}}
     @media(max-width:760px){.cred-label{display:none;}}
